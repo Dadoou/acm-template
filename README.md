@@ -23,7 +23,7 @@
 
 描述:简要描述算法实现框架（便于找错）。
 
-​```c++
+```c++
 /*
   Version: 1.0
   Author: 徐祥昊
@@ -136,6 +136,39 @@ int get_prime() {
 		}
 	}
 	return tot;
+}
+```
+
+## 扩展欧几里得求乘法逆元
+
+用于实现取模意义下的除法
+例如 (a*b/n)%m == (a%m)*(b%m)%m*inv(n,m)%m;
+
+扩展欧几里得实现，时间复杂度O(log(n)), 适用于a与m互质的情况;
+
+原理： n*inv|m == 1  =>  n*inv == k*m+1
+==>    n*inv + k*m == 1, 若n与m互质，则
+       n*inv + k*m == gcd(n, m) //扩展欧几里得原理
+故用欧几里得算法求得n在模m下的乘法逆元inv 
+
+```c++
+typedef long long LL;
+LL ex_gcd(LL a,LL b,LL &x,LL &y) {
+    if(b==0) {
+        x=1;
+        y=0;
+        return a;
+    }
+    LL ans=ex_gcd(b,a%b,x,y);
+    LL tmp=x;
+    x=y;
+    y=tmp-a/b*y;
+    return ans;
+}
+LL mod_inverse(LL a,LL m) {
+    long long x,y;
+    ex_gcd(a,m,x,y);
+    return (x%m+m)%m;
 }
 ```
 
