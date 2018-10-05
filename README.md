@@ -139,7 +139,7 @@ int get_prime() {
 }
 ```
 
-## 扩展欧几里得求乘法逆元
+## 乘法逆元
 
 用于实现取模意义下的除法
 例如 (a*b/n)%m == (a%m)*(b%m)%m*inv(n,m)%m;
@@ -170,6 +170,12 @@ LL mod_inverse(LL a,LL m) {
     ex_gcd(a,m,x,y);
     return (x%m+m)%m;
 }
+```
+
+O(n) 求逆元表的板子
+```c++
+int inv[1]=1;
+for(int i=2; i<n; i++) inv[i] = inv[mod%i]*(mod-mod/i)%mod;
 ```
 
 ## ST表
