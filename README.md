@@ -700,6 +700,93 @@ int main(){
 }
 ```
 
+## 最小费用最大流算法
+
+时间复杂度：O(VE)
+```c++
+#define N 3000
+#define INF 100000000
+
+using namespace std;
+
+struct Edge
+{
+    int from,to,cap,flow,cost;
+};
+struct MCMF
+{
+    int n,m,s,t;
+    vector<Edge>edges;
+    vector<int>G[N];
+    int inq[N];//是否在队列中
+    int d[N];//Bellman-Ford
+    int p[N];//上一条弧
+    int a[N];//可改进量
+
+    void init(int n)
+    {
+        this->n=n;
+        for(int i=0;i<=n;i++)
+            G[i].clear();
+        edges.clear();
+    }
+    void addedge(int from,int to,int cap,int cost)
+    {
+        edges.push_back((Edge){from,to,cap,0,cost});
+        edges.push_back((Edge){to,from,0,0,-cost});
+        m=edges.size();
+        G[from].push_back(m-2);
+        G[to].push_back(m-1);
+    }
+
+    bool BellmanFord(int s,int t,int&flow,long long&cost)//沿着最短路增广
+    {
+        for(int i=0;i<n;i++)
+            d[i]=INF;
+        memset(inq,0,sizeof(inq));
+        d[s]=0,inq[s]=1,p[s]=0,a[s]=INF;
+
+        queue<int>q;
+        q.push(s);
+        while(!q.empty())
+        {
+            int u=q.front();q.pop();
+            inq[u]=0;
+            for(int i=0;i<G[u].size();i++)
+            {
+                Edge&e=edges[G[u][i]];
+                if(e.cap>e.flow&&d[e.to]>d[u]+e.cost)//松弛操作
+                {
+                    d[e.to]=d[u]+e.cost;
+                    p[e.to]=G[u][i];//记录父边
+                    a[e.to]=min(a[u],e.cap-e.flow);//更新可改进量，等于min{到达u时候的可改进量，e边的残量}
+                    if(!inq[e.to]){q.push(e.to);inq[e.to]=1;}
+                }
+            }
+        }
+        if(d[t]==INF)//仍为初始时候的INF，s-t不连通，失败退出
+            return false;
+        flow+=a[t];
+        cost+=(long long)d[t]*a[t];//d[t]一方面代表了最短路长度，另一方面代表了这条最短路的单位费用的大小
+        int u=t;
+        while(u!=s)//逆向修改每条边的流量值
+        {
+            edges[p[u]].flow+=a[t];
+            edges[p[u]^1].flow-=a[t];
+            u=edges[p[u]].from;
+        }
+        return true;
+    }
+
+    int MincostMaxflow(int s,int t,long long&cost)//返回最大流，同时用引用返回达到最大流时的最小费用
+    {
+        int flow=0;
+        cost=0;
+        while(BellmanFord(s,t,flow,cost));//直到不存在最短路时停止
+            return flow;
+    }
+} D;
+```
 
 ## C组合数板子
 
