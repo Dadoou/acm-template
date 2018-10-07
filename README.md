@@ -243,7 +243,7 @@ int n; //实际数组的长度
 long long tree[4*N];
 
 void add(int k, long long v) {
-	while(k<n){
+	while(k<=n){
 		tree[k]+=v;
 		k+=(k&-k);	
 	}
